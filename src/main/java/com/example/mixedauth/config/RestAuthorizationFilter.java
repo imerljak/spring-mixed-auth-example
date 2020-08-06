@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Authorization filter for REST requests
+ */
 public class RestAuthorizationFilter extends OncePerRequestFilter {
 
     private final AntPathRequestMatcher pathMatcher;
@@ -50,6 +53,10 @@ public class RestAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Authenticates user in Spring security context.
+     * @param subject user subject/username
+     */
     private void authenticate(String subject) {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -59,6 +66,9 @@ public class RestAuthorizationFilter extends OncePerRequestFilter {
         ));
     }
 
+    /**
+     * Clears security context
+     */
     private void clearAuthentication() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }

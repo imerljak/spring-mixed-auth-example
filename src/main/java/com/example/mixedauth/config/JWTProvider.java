@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * Helper for JWT related things.
+ */
 @Component
 public class JWTProvider {
 
@@ -21,6 +24,11 @@ public class JWTProvider {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
+    /**
+     * Writes a JWT token to response body
+     * @param response current request's response
+     * @param authentication authentication for provided user/password
+     */
     public void writeToResponse(HttpServletResponse response, Authentication authentication) {
         if (authentication == null) {
             return;
@@ -37,6 +45,19 @@ public class JWTProvider {
         }
     }
 
+    /**
+     * Parses request token and returns subject.
+     * @param token request token extracted from Authentication header
+     * @return token subject
+     */
+    public String parseTokenForSubject(String token) {
+        return Jwts.parser()
+                .setSigningKey(signingKey())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
     private String generateToken(Authentication authentication) {
         final User token = (User) authentication.getPrincipal();
 
@@ -51,14 +72,6 @@ public class JWTProvider {
                 .setExpiration(expiration)
                 .signWith(signingKey())
                 .compact();
-    }
-
-    public String parseTokenForSubject(String token) {
-        return Jwts.parser()
-                .setSigningKey(signingKey())
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
     }
 
     private SecretKey signingKey() {

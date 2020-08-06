@@ -12,6 +12,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * REST based requests security configurator.
+ *
+ * Note: @Order is important here, since this configurator path (/rest/**) is more
+ * specific than {@link WebSecurityConfig} path, it should be loaded first, or else it will be ignored.
+ */
 @Order(1)
 @Configuration
 public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -46,7 +52,7 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(authorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .formLogin().disable();
+                .formLogin().disable(); // Not sure if needed since its overridden by custom filters.
     }
 
     private AuthenticationEntryPoint restfulAuthenticationEntryPoint() {

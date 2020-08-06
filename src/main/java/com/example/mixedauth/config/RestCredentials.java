@@ -6,6 +6,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+/**
+ * REST authentication credentials
+ */
 public class RestCredentials {
 
     private String username;

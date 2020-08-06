@@ -12,6 +12,10 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Filters and tries to authenticate REST based requests and returns a JWT token.
+ * Expects a POST request with a json request body matching {@link RestCredentials}
+ */
 public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final JWTProvider jwtProvider;
@@ -29,6 +33,9 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
+        /*
+         * Only accepts POST requests in this filter.
+         */
         if (!request.getMethod().equalsIgnoreCase("POST")) {
             throw new MethodNotAllowedAuthenticationException(request.getMethod());
         }
@@ -41,6 +48,10 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
         ));
     }
 
+    /**
+     * On unsuccessful authentication set response status for proper handling.
+     * If not overridden this method would redirect to /login
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         if (failed instanceof MethodNotAllowedAuthenticationException) {
@@ -50,11 +61,17 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
         }
     }
 
+    /**
+     * On successful authentication build and return a JWT token for use.
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         jwtProvider.writeToResponse(response, authResult);
     }
 
+    /**
+     * Custom exception to handle failed authentication when request method is invalid.
+     */
     static class MethodNotAllowedAuthenticationException extends AuthenticationException {
         public MethodNotAllowedAuthenticationException(String msg) {
             super(msg);

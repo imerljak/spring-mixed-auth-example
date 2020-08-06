@@ -9,10 +9,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -29,7 +27,7 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
         if (!request.getMethod().equalsIgnoreCase("POST")) {
             throw new MethodNotAllowedAuthenticationException(request.getMethod());
@@ -44,7 +42,7 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         if (failed instanceof MethodNotAllowedAuthenticationException) {
             response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {
@@ -53,11 +51,11 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         jwtProvider.writeToResponse(response, authResult);
     }
 
-    static class MethodNotAllowedAuthenticationException extends  AuthenticationException {
+    static class MethodNotAllowedAuthenticationException extends AuthenticationException {
         public MethodNotAllowedAuthenticationException(String msg) {
             super(msg);
         }
